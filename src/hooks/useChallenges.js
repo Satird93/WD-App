@@ -42,7 +42,8 @@ export function useChallenges(category = null) {
   // Following vercel-react-best-practices: async-defer-await
   const completeChallenge = useCallback(async (userId, challengeId, pointsEarned) => {
     try {
-      // Сначала записываем выполнение челленджа
+      // Записываем выполнение челленджа
+      // Триггер в базе данных автоматически обновит total_points
       const { error: insertError } = await supabase
         .from('user_challenges')
         .insert({
@@ -52,16 +53,6 @@ export function useChallenges(category = null) {
         })
 
       if (insertError) throw insertError
-
-      // Затем обновляем total_points пользователя
-      const { error: updateError } = await supabase.rpc('increment_user_points', {
-        p_user_id: userId,
-        p_points: pointsEarned,
-      })
-
-      if (updateError) {
-        console.warn('Error updating user points:', updateError)
-      }
 
       return { success: true }
     } catch (err) {

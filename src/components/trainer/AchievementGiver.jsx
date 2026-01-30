@@ -74,6 +74,7 @@ export default function AchievementGiver({ user, onSuccess }) {
       setLoading(true)
 
       // Создаём достижение
+      // Триггер в базе данных автоматически обновит total_points
       const { error: insertError } = await supabase
         .from('achievements')
         .insert({
@@ -86,19 +87,6 @@ export default function AchievementGiver({ user, onSuccess }) {
         })
 
       if (insertError) throw insertError
-
-      // Если есть очки, обновляем total_points пользователя
-      if (points > 0) {
-        const { error: updateError } = await supabase.rpc('increment_user_points', {
-          p_user_id: selectedUser,
-          p_points: parseInt(points),
-        })
-
-        if (updateError) {
-          console.warn('Could not update user points:', updateError)
-          // Не прерываем процесс, если RPC не существует
-        }
-      }
 
       setSuccess(true)
       setSelectedUser('')
