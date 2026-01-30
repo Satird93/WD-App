@@ -57,7 +57,10 @@ export default function ChallengesScreen({ user, onBack, onUserUpdate }) {
 
       // Обновляем данные пользователя (если передан callback)
       if (onUserUpdate) {
+        console.log('🔄 Calling onUserUpdate to refresh user data...')
         onUserUpdate()
+      } else {
+        console.warn('⚠️ onUserUpdate callback is not provided!')
       }
 
       // Показываем уведомление

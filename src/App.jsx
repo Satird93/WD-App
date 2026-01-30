@@ -27,6 +27,7 @@ function App() {
 
   useEffect(() => {
     if (user) {
+      console.log('🔄 User data updated:', user.total_points, 'points')
       setCurrentUser(user)
     }
   }, [user])

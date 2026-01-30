@@ -16,6 +16,7 @@ export function useAuth() {
 
   async function authenticateUser() {
     try {
+      console.log('🔐 Authenticating user...')
       setLoading(true)
       setError(null)
 
@@ -27,6 +28,7 @@ export function useAuth() {
 
       // Аутентифицируем пользователя
       const userData = await authenticateTelegramUser()
+      console.log('✅ User authenticated:', userData.full_name, '-', userData.total_points, 'points')
       setUser(userData)
     } catch (err) {
       setError(err.message)

@@ -15,15 +15,16 @@ export function useLeaderboard(type = 'home', limit = 10) {
   useEffect(() => {
     fetchLeaderboard()
 
-    // Realtime обновления
+    // Realtime обновления - слушаем изменения в таблице users
+    // Триггер обновляет total_points в users при выполнении челленджей
     const subscription = supabase
       .channel('leaderboard-updates')
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'UPDATE',
           schema: 'public',
-          table: type === 'home' ? 'user_challenges' : 'fights',
+          table: 'users',
         },
         () => {
           fetchLeaderboard()
@@ -114,3 +115,4 @@ export function useLeaderboard(type = 'home', limit = 10) {
 
   return { leaderboard, userPosition, loading, error, refetch: fetchLeaderboard }
 }
+
