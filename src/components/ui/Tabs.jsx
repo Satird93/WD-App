@@ -2,7 +2,7 @@
 // Following vercel-react-best-practices: rerender-functional-setstate
 export default function Tabs({ tabs, activeTab, onTabChange, className = '' }) {
   return (
-    <div className={`inline-flex gap-2 ${className}`}>
+    <div className={`flex flex-wrap gap-2 ${className}`}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id
 
