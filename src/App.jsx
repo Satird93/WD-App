@@ -85,16 +85,16 @@ function App() {
         }
         return <ChallengesScreen user={currentUser} onBack={() => setActiveTab('home')} onUserUpdate={retry} />
       case 'leaderboard':
-        return <Leaderboard user={currentUser} />
+        return <Leaderboard key={currentUser?.total_points} user={currentUser} />
       case 'profile':
-        return <Profile user={currentUser} />
+        return <Profile key={currentUser?.total_points} user={currentUser} />
       default:
         return <Dashboard user={currentUser} />
     }
   }
 
   return (
-    <div className="min-h-screen bg-alabaster">
+    <div className="min-h-screen bg-alabaster pb-20">
       {renderScreen()}
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
