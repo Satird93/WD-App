@@ -1,0 +1,98 @@
+import Header from '../layout/Header'
+import Card from '../ui/Card'
+import StatsChart from './StatsChart'
+import Achievements from './Achievements'
+
+/**
+ * Экран профиля пользователя
+ */
+export default function Profile({ user }) {
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-alabaster">
+        <p className="text-quick-silver">Загрузка профиля...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-alabaster pb-24">
+      <Header title="Профиль" emoji="👤" />
+      
+      <div className="p-4 space-y-4">
+        {/* Карточка пользователя */}
+        <Card className="text-center">
+          <div className="text-6xl mb-4">👤</div>
+          <h2 className="text-2xl font-bold text-strict-black mb-2">
+            {user.full_name}
+          </h2>
+          <p className="text-quick-silver mb-4">
+            @{user.username || 'пользователь'}
+          </p>
+
+          {/* Статистика */}
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-brandeis-blue">
+                {user.level || 1}
+              </div>
+              <div className="text-xs text-quick-silver mt-1">Уровень</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-brandeis-blue">
+                {user.total_points || 0}
+              </div>
+              <div className="text-xs text-quick-silver mt-1">Очков</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-peel">
+                {user.current_streak || 0}
+              </div>
+              <div className="text-xs text-quick-silver mt-1">
+                Дней подряд
+              </div>
+            </div>
+          </div>
+
+          {/* Специализация (если есть) */}
+          {user.fencing_specialization && (
+            <div className="mt-4 pt-4 border-t border-alice-blue">
+              <p className="text-sm text-quick-silver">Специализация</p>
+              <p className="text-lg font-semibold text-strict-black mt-1">
+                {user.fencing_specialization}
+              </p>
+            </div>
+          )}
+
+          {/* Роль */}
+          {user.role && (
+            <div className="mt-2">
+              <span
+                className={`
+                  inline-block px-3 py-1 rounded text-sm
+                  ${
+                    user.role === 'trainer' || user.role === 'admin'
+                      ? 'bg-orange-peel/10 text-orange-peel'
+                      : 'bg-brandeis-blue/10 text-brandeis-blue'
+                  }
+                `}
+              >
+                {user.role === 'trainer'
+                  ? 'Тренер'
+                  : user.role === 'admin'
+                  ? 'Администратор'
+                  : 'Ученик'}
+              </span>
+            </div>
+          )}
+        </Card>
+
+        {/* График прогресса */}
+        <StatsChart userId={user.id} />
+
+        {/* Достижения */}
+        <Achievements userId={user.id} />
+      </div>
+    </div>
+  )
+}
