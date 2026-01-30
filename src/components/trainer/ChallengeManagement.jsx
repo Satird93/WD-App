@@ -248,21 +248,21 @@ export default function ChallengeManagement({ user }) {
                   <div className="flex flex-col gap-2 ml-4">
                     <button
                       onClick={() => handleEdit(challenge)}
-                      className="flex items-center justify-center gap-1 bg-brandeis-blue text-white hover:bg-brandeis-blue/90 text-sm font-semibold px-4 py-2.5 rounded-lg border-2 border-strict-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all w-full whitespace-nowrap"
+                      className="flex items-center justify-center bg-brandeis-blue text-white hover:bg-brandeis-blue/90 text-2xl font-semibold p-3 rounded-lg border-2 border-strict-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+                      title="Изменить"
                     >
-                      <span>✏️</span>
-                      <span>Изменить</span>
+                      ✏️
                     </button>
                     <button
                       onClick={() => handleToggleActive(challenge)}
-                      className={`flex items-center justify-center gap-1 text-sm font-semibold px-4 py-2.5 rounded-lg border-2 border-strict-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all w-full whitespace-nowrap ${
+                      className={`flex items-center justify-center text-2xl font-semibold p-3 rounded-lg border-2 border-strict-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all ${
                         challenge.is_active
-                          ? 'bg-quick-silver/20 text-quick-silver hover:bg-quick-silver/30'
-                          : 'bg-green-500 text-white hover:bg-green-600'
+                          ? 'bg-quick-silver/20 hover:bg-quick-silver/30'
+                          : 'bg-green-500 hover:bg-green-600'
                       }`}
+                      title={challenge.is_active ? 'Выключить' : 'Включить'}
                     >
-                      <span>{challenge.is_active ? '🚫' : '✅'}</span>
-                      <span>{challenge.is_active ? 'Выкл' : 'Вкл'}</span>
+                      {challenge.is_active ? '🚫' : '✅'}
                     </button>
                   </div>
                 </div>
