@@ -180,12 +180,16 @@ export default function ChallengeManagement({ user }) {
     <div className="min-h-screen bg-alabaster p-6 pb-24">
       <div className="max-w-4xl mx-auto">
         {/* Заголовок */}
-        <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-strict-black">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-strict-black mb-4">
             Управление челленджами
           </h1>
-          <Button onClick={() => setShowForm(true)}>
-            + Создать
+          <Button 
+            onClick={() => setShowForm(true)}
+            className="w-full sm:w-auto text-base font-bold py-3 px-6"
+          >
+            <span className="text-lg mr-2">+</span>
+            Создать челлендж
           </Button>
         </div>
 
@@ -241,22 +245,24 @@ export default function ChallengeManagement({ user }) {
                   </div>
 
                   {/* Действия */}
-                  <div className="flex gap-2 ml-4">
+                  <div className="flex flex-col gap-2 ml-4 min-w-[120px]">
                     <button
                       onClick={() => handleEdit(challenge)}
-                      className="text-brandeis-blue hover:text-brandeis-blue/80 text-sm px-3 py-1 rounded border border-brandeis-blue"
+                      className="flex items-center justify-center gap-1 bg-brandeis-blue text-white hover:bg-brandeis-blue/90 text-sm font-semibold px-4 py-2.5 rounded-lg border-2 border-strict-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
                     >
-                      Изменить
+                      <span>✏️</span>
+                      <span>Изменить</span>
                     </button>
                     <button
                       onClick={() => handleToggleActive(challenge)}
-                      className={`text-sm px-3 py-1 rounded border ${
+                      className={`flex items-center justify-center gap-1 text-sm font-semibold px-4 py-2.5 rounded-lg border-2 border-strict-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all ${
                         challenge.is_active
-                          ? 'text-quick-silver border-quick-silver hover:bg-quick-silver/10'
-                          : 'text-green-600 border-green-600 hover:bg-green-50'
+                          ? 'bg-quick-silver/20 text-quick-silver hover:bg-quick-silver/30'
+                          : 'bg-green-500 text-white hover:bg-green-600'
                       }`}
                     >
-                      {challenge.is_active ? 'Деактивировать' : 'Активировать'}
+                      <span>{challenge.is_active ? '🚫' : '✅'}</span>
+                      <span>{challenge.is_active ? 'Выкл' : 'Вкл'}</span>
                     </button>
                   </div>
                 </div>

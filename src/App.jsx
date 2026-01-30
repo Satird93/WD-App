@@ -81,7 +81,7 @@ function App() {
       case 'challenges':
         // Для тренеров и админов - панель тренера, для студентов - список челленджей
         if (currentUser?.role === USER_ROLES.TRAINER || currentUser?.role === USER_ROLES.ADMIN) {
-          return <TrainerPanel user={currentUser} />
+          return <TrainerPanel user={currentUser} onBack={() => setActiveTab('home')} />
         }
         return <ChallengesScreen user={currentUser} onBack={() => setActiveTab('home')} />
       case 'leaderboard':
