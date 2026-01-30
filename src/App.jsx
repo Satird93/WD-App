@@ -18,7 +18,7 @@ import Loader from './components/ui/Loader'
 function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [currentUser, setCurrentUser] = useState(null)
-  const { user, loading, error } = useAuth()
+  const { user, loading, error, retry } = useAuth()
 
   useEffect(() => {
     // Инициализируем Telegram Mini App
@@ -83,7 +83,7 @@ function App() {
         if (currentUser?.role === USER_ROLES.TRAINER || currentUser?.role === USER_ROLES.ADMIN) {
           return <TrainerPanel user={currentUser} onBack={() => setActiveTab('home')} />
         }
-        return <ChallengesScreen user={currentUser} onBack={() => setActiveTab('home')} />
+        return <ChallengesScreen user={currentUser} onBack={() => setActiveTab('home')} onUserUpdate={retry} />
       case 'leaderboard':
         return <Leaderboard user={currentUser} />
       case 'profile':

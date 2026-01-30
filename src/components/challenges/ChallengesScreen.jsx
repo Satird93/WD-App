@@ -13,7 +13,7 @@ import { useChallenges } from '../../hooks/useChallenges'
  * Отображает доступные задания с учетом специализации
  * Following vercel-react-best-practices: rerender-functional-setstate
  */
-export default function ChallengesScreen({ user, onBack }) {
+export default function ChallengesScreen({ user, onBack, onUserUpdate }) {
   const [activeCategory, setActiveCategory] = useState(CATEGORIES.OFP)
   const [activeDifficulty, setActiveDifficulty] = useState('все')
   const [completedToday, setCompletedToday] = useState(new Set())
@@ -54,6 +54,11 @@ export default function ChallengesScreen({ user, onBack }) {
 
       // Обновляем список выполненных
       setCompletedToday(prev => new Set([...prev, challenge.id]))
+
+      // Обновляем данные пользователя (если передан callback)
+      if (onUserUpdate) {
+        onUserUpdate()
+      }
 
       // Показываем уведомление
       alert(`Челлендж выполнен! +${challenge.points} очков`)
