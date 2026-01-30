@@ -30,7 +30,7 @@ export default function Leaderboard({ user }) {
 
   return (
     <div className="min-h-screen bg-alabaster pb-24">
-      <Header title="Рейтинги" emoji="🏆" />
+      <Header title="Рейтинги" showBack={false} />
       
       <div className="p-4">
         {/* Табы */}

@@ -17,7 +17,7 @@ export default function Profile({ user }) {
 
   return (
     <div className="min-h-screen bg-alabaster pb-24">
-      <Header title="Профиль" emoji="👤" />
+      <Header title="Профиль" showBack={false} />
       
       <div className="p-4 space-y-4">
         {/* Карточка пользователя */}
