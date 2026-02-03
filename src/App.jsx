@@ -18,6 +18,7 @@ import Loader from './components/ui/Loader'
 function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [currentUser, setCurrentUser] = useState(null)
+  const [setupCompleted, setSetupCompleted] = useState(false)
   const { user, loading, error, retry } = useAuth()
 
   useEffect(() => {
@@ -59,17 +60,22 @@ function App() {
   }
 
   // Проверка: нужен ли экран выбора специализации для новых пользователей
+  // НЕ показываем, если пользователь уже прошёл/пропустил настройку в этой сессии
   const needsSpecializationSetup =
     currentUser &&
     currentUser.role === USER_ROLES.STUDENT &&
-    !currentUser.fencing_specialization
+    !currentUser.fencing_specialization &&
+    !setupCompleted
 
   // Показываем экран настройки специализации для новых учеников
   if (needsSpecializationSetup) {
     return (
       <SpecializationSetup
         user={currentUser}
-        onComplete={(updatedUser) => setCurrentUser(updatedUser)}
+        onComplete={(updatedUser) => {
+          setCurrentUser(updatedUser)
+          setSetupCompleted(true)
+        }}
       />
     )
   }
