@@ -83,6 +83,13 @@ export function useMascot(user) {
       const wins = recentFights?.filter(f => f.winner_id === userId).length || 0
       const losses = recentFights?.filter(f => f.loser_id === userId).length || 0
 
+      // Проверяем, есть ли челленджи сегодня
+      const today = new Date().toISOString().split('T')[0]
+      const hasChallengeToday = recentChallenges?.some(ch => {
+        const challengeDate = new Date(ch.completed_at).toISOString().split('T')[0]
+        return challengeDate === today
+      })
+
       return {
         current_streak: user.current_streak || 0,
         last_challenge_date: user.last_challenge_date,
@@ -93,6 +100,7 @@ export function useMascot(user) {
         losses,
         achievements_count: recentAchievements?.length || 0,
         has_new_achievement: (recentAchievements?.length || 0) > 0,
+        has_challenge_today: hasChallengeToday,
       }
     } catch (error) {
       console.error('Error fetching user activity:', error)
@@ -104,6 +112,7 @@ export function useMascot(user) {
         losses: 0,
         achievements_count: 0,
         has_new_achievement: false,
+        has_challenge_today: false,
       }
     }
   }
@@ -120,15 +129,21 @@ export function useMascot(user) {
       wins,
       losses,
       has_new_achievement,
+      has_challenge_today,
     } = userData
+
+    // ПРИОРИТЕТ 0: Новый пользователь (нет истории активности)
+    if (!last_challenge_date && current_streak === 0) {
+      return 'мотивация' // Приветствуем новичка мотивацией
+    }
 
     // Проверяем, сколько дней прошло с последней активности
     const daysSinceLastActivity = last_challenge_date
       ? Math.floor((new Date() - new Date(last_challenge_date)) / (1000 * 60 * 60 * 24))
-      : 999
+      : 0
 
     // ПРИОРИТЕТ 1: Критические ситуации (долгое отсутствие)
-    if (current_streak === 0 && daysSinceLastActivity > 3) {
+    if (current_streak === 0 && daysSinceLastActivity > 7) {
       return 'порицание' // Жесткое порицание за долгое отсутствие
     }
 
@@ -137,35 +152,60 @@ export function useMascot(user) {
       return 'похвала'
     }
 
-    // ПРИОРИТЕТ 3: Дисбаланс активности (много челленджей, мало боев)
+    // ПРИОРИТЕТ 3: Активность сегодня + хороший стрик
+    if (has_challenge_today && current_streak >= 3) {
+      return 'похвала' // Хвалим за поддержание стрика
+    }
+
+    // ПРИОРИТЕТ 4: Дисбаланс активности (много челленджей, мало боев)
     if (challenges_count > 5 && fights_count === 0) {
       return 'ирония' // Ирония: тренируется дома, но не дерется
     }
 
-    // ПРИОРИТЕТ 4: Много поражений подряд
+    // ПРИОРИТЕТ 5: Много поражений подряд
     if (losses > wins && losses >= 3) {
       return 'мотивация' // Мотивируем после поражений
     }
 
-    // ПРИОРИТЕТ 5: Много побед подряд
+    // ПРИОРИТЕТ 6: Много побед подряд
     if (wins > losses && wins >= 3) {
       return 'похвала' // Хвалим за победы
     }
 
     // ПРИОРИТЕТ 6: Стрик (основная логика)
     if (current_streak === 0) {
-      return 'порицание'
+      // Стрик сброшен недавно (1-7 дней назад)
+      if (daysSinceLastActivity > 0 && daysSinceLastActivity <= 7) {
+        return 'мотивация' // Мотивируем начать заново
+      }
+      return 'порицание' // Fallback для стрика 0
     } else if (current_streak >= 7) {
       return 'похвала' // Длинный стрик заслуживает похвалы
     } else if (current_streak >= 3) {
       return 'мотивация' // Средний стрик - мотивируем продолжать
     } else if (current_streak >= 1) {
-      // Короткий стрик - иногда ирония для разнообразия
-      return Math.random() > 0.6 ? 'ирония' : 'мотивация'
+      // Короткий стрик - детерминированный выбор между иронией и мотивацией
+      return getDeterministicCategory(user.id, ['ирония', 'мотивация'])
     }
 
     // По умолчанию - мотивация
     return 'мотивация'
+  }
+
+  /**
+   * Детерминированный выбор категории на основе userId и текущей даты
+   * Гарантирует, что одно и то же сообщение показывается в течение дня
+   */
+  function getDeterministicCategory(userId, categories) {
+    const today = new Date().toISOString().split('T')[0]
+    const seed = today + userId
+    
+    // Простой хеш-функция
+    const hash = seed.split('').reduce((acc, char) => {
+      return acc + char.charCodeAt(0)
+    }, 0)
+    
+    return categories[hash % categories.length]
   }
 
   /**
