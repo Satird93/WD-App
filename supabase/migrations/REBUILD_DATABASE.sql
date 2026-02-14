@@ -102,26 +102,50 @@ CREATE TRIGGER update_users_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- Функция подсчёта стрика
+-- Функция подсчёта стрика (ИСПРАВЛЕННАЯ ВЕРСИЯ)
+-- Стрик сохраняется, если последний челлендж был сегодня или вчера
 CREATE OR REPLACE FUNCTION calculate_streak(p_user_id UUID)
 RETURNS INTEGER AS $$
 DECLARE
   v_streak INTEGER := 0;
-  v_current_date DATE := CURRENT_DATE;
+  v_expected_date DATE;
+  v_last_challenge_date DATE;
   v_check_date DATE;
 BEGIN
+  -- Получаем дату последнего выполненного челленджа
+  SELECT DATE(MAX(completed_at)) INTO v_last_challenge_date
+  FROM user_challenges
+  WHERE user_id = p_user_id;
+  
+  -- Если нет челленджей - стрик 0
+  IF v_last_challenge_date IS NULL THEN
+    RETURN 0;
+  END IF;
+  
+  -- Стрик сохраняется, если последний челлендж был сегодня или вчера
+  -- Иначе стрик прерван
+  IF v_last_challenge_date < CURRENT_DATE - INTERVAL '1 day' THEN
+    RETURN 0;
+  END IF;
+  
+  -- Начинаем считать с даты последнего челленджа
+  v_expected_date := v_last_challenge_date;
+  
+  -- Считаем последовательные дни
   FOR v_check_date IN
     SELECT DISTINCT DATE(completed_at) as challenge_date
     FROM user_challenges
     WHERE user_id = p_user_id
     ORDER BY challenge_date DESC
   LOOP
-    IF v_check_date = v_current_date THEN
+    IF v_check_date = v_expected_date THEN
       v_streak := v_streak + 1;
-      v_current_date := v_current_date - INTERVAL '1 day';
-    ELSE
+      v_expected_date := v_expected_date - INTERVAL '1 day';
+    ELSIF v_check_date < v_expected_date THEN
+      -- Пропущен день - стрик прерван
       EXIT;
     END IF;
+    -- Если v_check_date > v_expected_date, это дубликат, пропускаем
   END LOOP;
 
   RETURN v_streak;

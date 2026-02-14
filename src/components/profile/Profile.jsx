@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../utils/supabaseClient'
+import { showTelegramConfirm, showTelegramAlert, deleteUserAccount, triggerHapticFeedback } from '../../utils/telegramAuth'
 import Header from '../layout/Header'
 import Card from '../ui/Card'
 import StatsChart from './StatsChart'
@@ -10,9 +11,10 @@ import Loader from '../ui/Loader'
  * Экран профиля пользователя
  * Загружает актуальные данные из БД при каждом открытии
  */
-export default function Profile({ user }) {
+export default function Profile({ user, onAccountDeleted }) {
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (user?.id) {
@@ -37,6 +39,44 @@ export default function Profile({ user }) {
       setUserData(user)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleDeleteAccount() {
+    try {
+      // Подтверждение через Telegram
+      const confirmed = await showTelegramConfirm(
+        '⚠️ Вы уверены, что хотите удалить аккаунт?\n\nЭто действие необратимо. Будут удалены:\n• Ваш профиль\n• Все выполненные челленджи\n• Все достижения\n• История стриков'
+      )
+
+      if (!confirmed) {
+        return
+      }
+
+      setDeleting(true)
+      triggerHapticFeedback('medium')
+
+      // Удаляем аккаунт
+      const result = await deleteUserAccount(userData.id)
+
+      if (result.success) {
+        triggerHapticFeedback('success')
+        showTelegramAlert('✅ Аккаунт успешно удалён')
+        
+        // Вызываем callback для очистки состояния приложения
+        if (onAccountDeleted) {
+          onAccountDeleted()
+        }
+      } else {
+        triggerHapticFeedback('error')
+        showTelegramAlert(`❌ Ошибка при удалении аккаунта: ${result.error}`)
+        setDeleting(false)
+      }
+    } catch (err) {
+      console.error('Error in handleDeleteAccount:', err)
+      triggerHapticFeedback('error')
+      showTelegramAlert('❌ Произошла ошибка при удалении аккаунта')
+      setDeleting(false)
     }
   }
 
@@ -125,7 +165,29 @@ export default function Profile({ user }) {
 
         {/* Достижения */}
         <Achievements userId={userData.id} />
+
+        {/* Кнопка удаления аккаунта */}
+        <div className="pt-6 pb-4 text-center">
+          <button
+            onClick={handleDeleteAccount}
+            disabled={deleting}
+            className="text-red-500 hover:text-red-600 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto"
+          >
+            {deleting ? (
+              <>
+                <Loader size="small" />
+                <span>Удаление...</span>
+              </>
+            ) : (
+              <>
+                <span>🗑️</span>
+                <span>Удалить аккаунт</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   )
 }
+

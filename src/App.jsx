@@ -33,6 +33,17 @@ function App() {
     }
   }, [user])
 
+  // Обработчик удаления аккаунта
+  function handleAccountDeletion() {
+    // Очищаем состояние пользователя
+    setCurrentUser(null)
+    setSetupCompleted(false)
+    
+    // Перезагружаем приложение для повторной авторизации
+    // Это вызовет useAuth hook заново
+    window.location.reload()
+  }
+
   // Обработка ошибок авторизации
   if (error) {
     return (
@@ -94,7 +105,7 @@ function App() {
       case 'leaderboard':
         return <Leaderboard key={currentUser?.total_points} user={currentUser} />
       case 'profile':
-        return <Profile key={currentUser?.total_points} user={currentUser} />
+        return <Profile key={currentUser?.total_points} user={currentUser} onAccountDeleted={handleAccountDeletion} />
       default:
         return <Dashboard user={currentUser} />
     }
@@ -109,3 +120,4 @@ function App() {
 }
 
 export default App
+

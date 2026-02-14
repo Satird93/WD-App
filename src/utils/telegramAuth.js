@@ -150,3 +150,29 @@ export function triggerHapticFeedback(style = 'light') {
     styles[style]?.()
   }
 }
+
+/**
+ * Удаление аккаунта пользователя
+ * Удаляет пользователя из БД вместе со всеми связанными данными
+ * @param {string} userId - ID пользователя для удаления
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export async function deleteUserAccount(userId) {
+  try {
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', userId)
+
+    if (error) {
+      console.error('Error deleting user account:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  } catch (err) {
+    console.error('Unexpected error deleting account:', err)
+    return { success: false, error: err.message }
+  }
+}
+
