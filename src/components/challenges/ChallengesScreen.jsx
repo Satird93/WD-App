@@ -70,29 +70,29 @@ export default function ChallengesScreen({ user, onBack, onUserUpdate }) {
     }
   }
 
-  // Фильтрация челленджей по специализации и сложности
-  const filteredChallenges = challenges.filter(ch => {
-    // Фильтр по сложности
-    if (activeDifficulty !== 'все' && ch.difficulty !== activeDifficulty) {
-      return false
-    }
-
+  // Фильтрация челленджей по специализации (БЕЗ фильтра по сложности для счётчиков)
+  const challengesByCategory = challenges.filter(ch => {
     // Для фехтования фильтруем по специализации пользователя
     if (activeCategory === CATEGORIES.FENCING) {
       // Показываем общие челленджи и челленджи для специализации пользователя
       return ch.fencing_specialization === 'общее' ||
              ch.fencing_specialization === user?.fencing_specialization
     }
-
     return true
   })
 
-  // Группировка по сложности
+  // Группировка по сложности (для счётчиков - используем challengesByCategory)
   const groupedChallenges = {
-    [DIFFICULTY.EASY]: filteredChallenges.filter(ch => ch.difficulty === DIFFICULTY.EASY),
-    [DIFFICULTY.MEDIUM]: filteredChallenges.filter(ch => ch.difficulty === DIFFICULTY.MEDIUM),
-    [DIFFICULTY.HARD]: filteredChallenges.filter(ch => ch.difficulty === DIFFICULTY.HARD),
+    [DIFFICULTY.EASY]: challengesByCategory.filter(ch => ch.difficulty === DIFFICULTY.EASY),
+    [DIFFICULTY.MEDIUM]: challengesByCategory.filter(ch => ch.difficulty === DIFFICULTY.MEDIUM),
+    [DIFFICULTY.HARD]: challengesByCategory.filter(ch => ch.difficulty === DIFFICULTY.HARD),
   }
+
+  // Фильтрация для отображения (с учётом выбранной сложности)
+  const filteredChallenges = activeDifficulty === 'все'
+    ? challengesByCategory
+    : groupedChallenges[activeDifficulty]
+
 
   if (loading || loadingCompleted) {
     return (
@@ -121,7 +121,7 @@ export default function ChallengesScreen({ user, onBack, onUserUpdate }) {
   ]
 
   const difficultyTabs = [
-    { id: 'все', label: 'Все', count: filteredChallenges.length },
+    { id: 'все', label: 'Все', count: challengesByCategory.length },
     { id: DIFFICULTY.EASY, label: 'Легко', count: groupedChallenges[DIFFICULTY.EASY].length },
     { id: DIFFICULTY.MEDIUM, label: 'Средне', count: groupedChallenges[DIFFICULTY.MEDIUM].length },
     { id: DIFFICULTY.HARD, label: 'Хард', count: groupedChallenges[DIFFICULTY.HARD].length },
